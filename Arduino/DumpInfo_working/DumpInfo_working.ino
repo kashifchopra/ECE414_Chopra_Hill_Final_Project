@@ -37,47 +37,24 @@
 
 #include <SPI.h>
 #include <MFRC522.h>
+#include "rfid_fsm.h"
 
 // Define pin connections for Raspberry Pi Pico
-#define RST_PIN         9   // GP9
-#define SS_PIN          17  // GP17 (CS pin for SPI)
+// #define RST_PIN         9   // GP9
+// #define SS_PIN          17  // GP17 (CS pin for SPI)
 
-MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
+// MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 void setup() {
     Serial.begin(9600);             // Initialize serial communications
     while (!Serial);                // Wait for serial port to connect
-
     SPI.begin();                    // Start SPI communication
 
-    mfrc522.PCD_Init();             // Initialize the MFRC522 module
-    delay(4);                       // Optional delay for some boards
+    rfid_init();
 
-    // Print MFRC522 firmware details
-    mfrc522.PCD_DumpVersionToSerial();
-    Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
-
-     pinMode(25, OUTPUT);
 }
 
 void loop() {
-
- digitalWrite(25, HIGH); 
-
-    if (!mfrc522.PICC_IsNewCardPresent()) {
-        Serial.println(F("No card detected"));
-        delay(500);
-        return;
-    }
-
-    if (!mfrc522.PICC_ReadCardSerial()) {
-        Serial.println(F("Card read failed"));
-        delay(500);
-        return;
-    }
-
-    Serial.println(F("Card detected!"));
-    // Dump debug info about the card
-    mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+rfid_fsm();
 }
 
