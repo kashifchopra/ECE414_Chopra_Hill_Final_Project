@@ -19,7 +19,7 @@ void setup(){
 
 void loop(){ //MAIN but arduino
   pir_read();
-  tickFnct_pir();
+  //tickFnct_pir(); // Not needed here - Now this function is being used in the RFID main unit 
 
   lora_trans_operate();
 }

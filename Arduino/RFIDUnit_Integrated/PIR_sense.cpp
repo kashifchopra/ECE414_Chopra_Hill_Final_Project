@@ -6,7 +6,7 @@
 #include "hardware/adc.h"
 #include <stdio.h>
 #include <stdbool.h>
-//#include "lora_trans.h" -- when made
+#include "LoRa_rec.h"
 
 //Define PICO pin connections
 
@@ -15,12 +15,13 @@
 //Define states global var
 PIR_STATES STATE = INIT; //initialize to init
 
-bool motion;                //PIR data, high or low
+//bool motion;                //PIR data, high or low = gets by importing LoRa_rec,h
 bool occupied;              //boolean flag
-uint32_t internal_cnt = 0;      //counter incremented once every second in OCCUPIED state
+uint32_t internal_cnt;      //counter incremented once every second in OCCUPIED state
 uint32_t occ_tmr_cnt;       //cycles of no motion
-uint32_t TIMER_LIMIT = 20;  //SUBJECT TO CHANGE FOR TESTING PURPOSES 
+uint32_t TIMER_LIMIT = 4;  //SUBJECT TO CHANGE FOR TESTING PURPOSES // 4 cycles of 5 seconds (comes from INTERNAL_CNT_MAX) each = 20 seconds for total time of no motion after which it switches to unoccupied
 const uint32_t pir_gpio = 4; //gpio 4
+const uint32_t INTERNAL_CNT_MAX = 5; // max number of seconds for internal count before it gets set back to zero. At the end of each 5 second interval with no motion, occupied_tmr_cnt gets incremented once. 
 
 void pir_init() {  //low level code to initialize port
   adc_init();
@@ -29,14 +30,14 @@ void pir_init() {  //low level code to initialize port
   Serial.println("PIR init");
 }
 
-bool pir_read() {  //boolean output of pir
-  motion = gpio_get(pir_gpio);
-  Serial.print("Motion Detected: ");
-  Serial.println(motion);
-  return motion;
-}
+// bool pir_read() {  //boolean output of pir no use in this module since this is the reciever just need PIR FSM
+//   //motion = gpio_get(pir_gpio);
+//   Serial.print("Motion Detected: ");
+//   Serial.println(motion);
+//   return motion;
+// }
 
-void tickFnct_pir() { // UNUSED HERE used in the RFID unit
+void tickFnct_pir() {
 
   switch (STATE) {
 
@@ -57,7 +58,7 @@ void tickFnct_pir() { // UNUSED HERE used in the RFID unit
         occupied = true;
         STATE = OCC;
       }
-      delay(1000);
+      //delay(1000);
       break;
 
     case OCC:
@@ -88,7 +89,7 @@ void tickFnct_pir() { // UNUSED HERE used in the RFID unit
         STATE = UNOCC;
       }
 
-      if (internal_cnt == 5){ //same as above, only 5 for testing purposes, use 60
+      if (internal_cnt >= INTERNAL_CNT_MAX){ //same as above, only 5 for testing purposes, use 60
         internal_cnt = 0;
       }
 

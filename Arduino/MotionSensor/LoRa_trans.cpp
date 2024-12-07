@@ -56,7 +56,7 @@ void lora_trans_operate(){
 
   msgCount++;
 
-  //2 second delay
-  delay(2000);
+  //0.5 second delay
+  delay(500);
 
 }
