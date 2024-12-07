@@ -7,6 +7,7 @@ typedef enum{
 } PIR_STATES;
 
 extern PIR_STATES STATE;
+extern bool motion; 
 
 void pir_init();
 bool pir_read();

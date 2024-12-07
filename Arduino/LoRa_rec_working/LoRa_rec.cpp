@@ -15,7 +15,7 @@
 const int csPin = 13; // LoRa radio chip select
 const int resetPin = 10; // LoRa radio reset
 const int irqPin = 7; // Must be a hardware interrupt pin
-bool occupied = 0; //occupied variable 
+bool motion = 0; //motion variable 
 int receivedValue;
 
 //initialise LoRa receiver (same as initialising transmitter)
@@ -46,13 +46,13 @@ void lora_rec_operate(){
       receivedValue = LoRa.read(); //CHECKME should be fine though 
 
       if(receivedValue == 49){ //"1" as a character is ASCII 49, since LoRa.read(0) reads it as a character
-        occupied = 1;
+        motion = 1;
       } else {
-        occupied = 0;
+        motion = 0;
       }
 
-      Serial.print("Occupied: ");
-      Serial.print(occupied);
+      Serial.print("Motion: ");
+      Serial.print(motion);
 
       // Serial.print((char)LoRa.read()); //Use for printing if packet has multiple characters 
     }

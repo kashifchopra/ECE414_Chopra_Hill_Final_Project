@@ -10,7 +10,7 @@
 
 //Define PICO pin connections
 
-#define SS_PIN 16  // GPIO 17 for PIR
+#define SS_PIN 4  // GPIO 4 for PIR //No use for SS here since its not SPI correct?
 
 //Define states global var
 PIR_STATES STATE = INIT; //initialize to init
@@ -19,8 +19,8 @@ bool motion;                //PIR data, high or low
 bool occupied;              //boolean flag
 uint32_t internal_cnt;      //counter incremented once every second in OCCUPIED state
 uint32_t occ_tmr_cnt;       //cycles of no motion
-uint32_t timer_limit = 20;  //SUBJECT TO CHANGE FOR TESTING PURPOSES
-const uint32_t pir_gpio = 16;
+uint32_t timer_limit = 20;  //SUBJECT TO CHANGE FOR TESTING PURPOSES //UNUSED YET
+const uint32_t pir_gpio = 4; //gpio 4
 
 void pir_init() {  //low level code to initialize port
   adc_init();
@@ -62,9 +62,9 @@ void tickFnct_pir() {
 
     case OCC:
       Serial.println(F("Occupied"));
-      Serial.printf("Minutes Passed: ");
+      Serial.print("Minutes Passed: ");
       Serial.println(F(internal_cnt));
-      Serial.printf("Occ_tmr_cnt: ");
+      Serial.print("Occ_tmr_cnt: ");
       Serial.println(F(occ_tmr_cnt));
       //maybe print internal timer cnt, stuff liek that 
       
@@ -74,12 +74,12 @@ void tickFnct_pir() {
       }
 
       if (internal_cnt >= 60) {  //will occur once every minute
-        if (!motion && occ_tmr_cnt << 20) {
+        if (!motion && occ_tmr_cnt << timer_limit) { // was hardcoded 20 earlier
           occ_tmr_cnt++;
         }
       }
 
-      if (occ_tmr_cnt >= 20) {
+      if (occ_tmr_cnt >= timer_limit) {
         STATE = UNOCC;
       }
 
