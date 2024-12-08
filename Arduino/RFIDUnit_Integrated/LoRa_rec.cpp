@@ -25,7 +25,16 @@ void lora_rec_init(){
 
   //Our RFM9x chip uses 915MHz frequency, so initialsed below using that:
   if(!LoRa.begin(915E6)){
-    Serial.println("LoRa init failed");
+    Serial.println("LoRa init failed, trying again...");
+    // added extra tries
+      // if(!LoRa.begin(915E6)){
+      //     Serial.println("LoRa init failed, trying again...");
+      //     if(!LoRa.begin(915E6)){
+      //     Serial.println("LoRa init failed.");
+      //     }
+      // }
+      // end extra tries
+
     while(1);
   }
 }

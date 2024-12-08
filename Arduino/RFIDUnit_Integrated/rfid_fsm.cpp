@@ -194,7 +194,7 @@ void rfid_fsm(){
             break;
 
         case booked:
-            if(!occupied || booking_tmr_complete){ //bool occupied is a global variable set by PIR.c module on motion detector and receioved over LoRa on lora_rec.c 
+            if( (occupied==false) || booking_tmr_complete){ //bool occupied is a global variable set by PIR.c module on motion detector and receioved over LoRa on lora_rec.c 
                 RFID_STATE = available; 
             } else {
                 RFID_STATE = booked; 

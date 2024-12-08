@@ -15,10 +15,13 @@
 #include <LoRa.h>
 #include "LoRa_rec.h"
 #include "PIR_sense.h"
-//#include SCREEN MODULE ADD HERE
+#include "display.h"
+
 
 #define RFID_CS 17
 #define LoRa_rec_CS 13
+
+// Adafruit_ILI9341 tft = Adafruit_ILI9341(2, 0, 3, 1, -1, -1); // create instance of screen
 
 void setup() {
     Serial.begin(9600);             // Initialize serial communications
@@ -35,8 +38,8 @@ void setup() {
     digitalWrite(LoRa_rec_CS, LOW);
     lora_rec_init();
 
-
     //screen_init add here
+    lcd_init();
 }
 
 void loop() {
@@ -51,10 +54,30 @@ lora_rec_operate();
 //After receving LoRa data, process it using PIR FSM: 
 tickFnct_pir();
 
+// try looking for signals once more
+lora_rec_operate();
+
 //Turn on RFID via chip select and run top level RFID FSM
 digitalWrite(RFID_CS, LOW);
 digitalWrite(LoRa_rec_CS, HIGH);
 rfid_fsm();
 
+// sense for signals once more for redundancy and avoid missed signals 
+lora_rec_operate();
+
+// sense for signals once more
+lora_rec_operate();
+
+//write to screen 
+tickFnct_disp();
+
+// sense for signals once more
+//lora_rec_operate();
+
+// sense for signals once more
+lora_rec_operate();
+
+// sense for signals once more
+lora_rec_operate();
 }
 
