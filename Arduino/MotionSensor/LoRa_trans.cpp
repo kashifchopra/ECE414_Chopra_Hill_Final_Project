@@ -14,7 +14,7 @@
 const int csPin = 13;     // LoRa radio chip select
 const int resetPin = 10;  // LoRa radio reset
 const int irqPin = 7;    // Must be a hardware interrupt pin
-//bool motion = 1; //CONNEC WITH PIR UNIT
+//bool motion_debounced; //Now received from PIR UNIT
 
 // Message counter
 byte msgCount = 0;
@@ -32,14 +32,7 @@ void lora_trans_init(){
 }
 
 void lora_trans_operate(){
-  //TEMPORARY testing alternate between 1 and 0. occupied value must be read from PIR unit
-  // if(msgCount%2 == 1){
-  //   occupied = 1;
-  // } else {
-  //   occupied = 0;
-  // }
-  // testing unit end// DELTE THIS LATER
- 
+  
   Serial.print("Sending packet: ");
   Serial.println(msgCount);
  
@@ -47,11 +40,11 @@ void lora_trans_operate(){
   LoRa.beginPacket();
   //LoRa.print("Packet ");
   //LoRa.print(msgCount);
-  LoRa.print(motion); // send raw PIR motion data 
+  LoRa.print(motion_debounced); // send debounced PIR motion data 
   LoRa.endPacket();
  
   Serial.print("Sent: ");
-  Serial.println(motion);
+  Serial.println(motion_debounced);
 
 
   msgCount++;

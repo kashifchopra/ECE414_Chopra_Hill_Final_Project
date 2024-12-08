@@ -1,3 +1,9 @@
+/*
+Authors: Ben Hill and Kashif Chopra
+Date: December 6th 2024 
+Latest: Added debouncer to get stable PIR readings 
+*/
+
 #include <SPI.h>
 #include <Arduino.h>
 #include "PIR_sense.h"
@@ -22,6 +28,17 @@ uint32_t occ_tmr_cnt;       //cycles of no motion
 uint32_t TIMER_LIMIT = 20;  //SUBJECT TO CHANGE FOR TESTING PURPOSES 
 const uint32_t pir_gpio = 4; //gpio 4
 
+//variables used for debouncer
+uint32_t current_time = 0; 
+uint32_t elapsed_time_debounce; 
+const uint32_t DEBOUNCE_TIMER = 1000; //sample motion every 1s
+const uint32_t DEBOUNCE_PERIOD = 5; // total time (s) over which it is debounced. 
+const uint32_t MOTION_CNT_THRESHOLD = 4; // ie, if 4 or more out of every 5 debounced readings (ie readings taken once per second) of the PIR must be high for us to say motion_debounced = 1. Adjusted as needed according to sensitivity desired. 
+bool motion_debounced = 0; //transmitted over LoRa
+uint32_t motion_cnt = 0;
+uint32_t debounce_cnt = 0;
+
+
 void pir_init() {  //low level code to initialize port
   adc_init();
   _gpio_init(pir_gpio);
@@ -31,10 +48,47 @@ void pir_init() {  //low level code to initialize port
 
 bool pir_read() {  //boolean output of pir
   motion = gpio_get(pir_gpio);
-  Serial.print("Motion Detected: ");
-  Serial.println(motion);
+  // Serial.print("Motion Detected: "); //only for testing uncomment if needed (better to Serial.print motion_debounced instead)
+  // Serial.println(motion);
   return motion;
 }
+
+
+// Motion detection debouncer to get stable results from PIR
+void pir_debounce(){
+
+  elapsed_time_debounce = millis() - current_time; //
+
+  // Serial.print("elapsed_time_debounce: ");  //for testing only
+  // Serial.println(elapsed_time_debounce);
+  // Serial.print("motion_cnt: ");
+  // Serial.println(motion_cnt);
+  // Serial.print("debounce_cnt: ");
+  // Serial.println(debounce_cnt);
+
+  if(elapsed_time_debounce >= DEBOUNCE_TIMER){ //every 1s sample motion
+    
+    if(motion){
+      motion_cnt++;
+    } 
+    current_time = millis();
+    debounce_cnt++;
+  }
+
+  if(debounce_cnt >= DEBOUNCE_PERIOD){ //rn 5 seconds debounce period
+
+    if(motion_cnt>=MOTION_CNT_THRESHOLD){ // if MOTION_CNT_THRESHOLD  = 4 that means 4 or more times out of 5 if motion is detected, then motion is high else it is debounced to low. Adjust this number as needed via testing. 
+      motion_debounced = 1;
+    } else {
+      motion_debounced = 0;
+    }
+    debounce_cnt = 0; //reset debounce_cnt
+    motion_cnt = 0; //reset this
+  }
+}
+  
+
+
 
 void tickFnct_pir() { // UNUSED HERE used in the RFID unit
 

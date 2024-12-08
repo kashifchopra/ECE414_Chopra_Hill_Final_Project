@@ -20,6 +20,10 @@ void setup(){
 void loop(){ //MAIN but arduino
   pir_read();
   //tickFnct_pir(); // Not needed here - Now this function is being used in the RFID main unit 
+  pir_debounce();
+  Serial.print("motion_debounced: ");
+  Serial.println(motion_debounced);
 
+  //send PIR motion_debounced over LoRa:
   lora_trans_operate();
 }
