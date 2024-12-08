@@ -18,12 +18,13 @@ RFID_STATES RFID_STATE;
 //bool occupied = 1; // TEMPORARY remove later
 
 uint16_t booking_userID[4]; // = uid from RFID //rn hard set size to 4 but might wanna check with different RFID fobs - might wanna set it = mfrc522.uid.size
-//occupied (access from PIR_sense.h)
+//occupied (access from PIR_sense.h) //make extern and add to .h
 
 bool booking_tmr_complete = false; //flag for when booking timer is up
 bool welcome_tmr_complete = false; //flag for when welcome screen timer is up, after which it will switch to "booked" screen
 
 bool alert = false; //when alert = 1; the screen will simply highlight (with a different Bg color) the person who is currenbtly booked
+//make extern and add to .h
 
 unsigned long booking_tmr = 0; 
 unsigned long welcome_tmr = 0; 
@@ -31,7 +32,7 @@ unsigned long welcome_tmr = 0;
 const uint32_t BOOKING_TMR_PERIOD = 40000; //in ms set as needed, constant - total time one booking can be 
 const uint32_t WELCOME_TMR_PERIOD = 5000; //in ms set as needed, constant
 
-uint32_t booking_tmr_remaining = 0; 
+uint32_t booking_tmr_remaining = 0; //make extern and add to .h
 
 //functions to use: 
 //mfrc522.PICC_IsNewCardPresent()
