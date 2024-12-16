@@ -3,7 +3,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include "rfid_fsm.h"
-//#include <lora_rec.h> // add when made
+//#include <LoRa_rec.h> // add when made
 
 // Define pin connections for Raspberry Pi Pico
 #define RST_PIN         9   // GP9
